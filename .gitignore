@@ -1,7 +1,5 @@
 # Node modules in all subdirectories
 **/node_modules/
-**/dist/
-**/build/
 **/.next/
 
 # Environment files

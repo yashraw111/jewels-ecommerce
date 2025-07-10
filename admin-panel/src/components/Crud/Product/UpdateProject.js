@@ -15,7 +15,7 @@ import {
 } from '@coreui/react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
-import { UpdateProduct, ViewList } from '../UserSlice'
+import { UpdateProduct, ViewList } from '../ProductSlice'
 import { ViewCateList } from '../CategorySlice'
 import axios from 'axios'
 // import { ViewSubCateList } from '../SubCategory'
