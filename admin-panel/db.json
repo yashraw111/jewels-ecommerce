@@ -1,0 +1,26 @@
+{
+  "product": [
+    {
+      "id": "96b5",
+      "productName": "lg",
+      "category": "tv",
+      "productPrice": "150000",
+      "productDescription": "dhjb nmndv jd",
+      "url": "https://res.cloudinary.com/dd8jcqy60/image/upload/v1734943755/ltumltzlgw30nnpbuzdd.jpg"
+    }
+  ],
+  "category": [
+    {
+      "id": "323f",
+      "category": "phone"
+    },
+    {
+      "id": "a40b",
+      "category": "tv"
+    },
+    {
+      "id": "4d29",
+      "category": "d  d"
+    }
+  ]
+}
