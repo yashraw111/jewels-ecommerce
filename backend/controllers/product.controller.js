@@ -157,10 +157,91 @@ const getProductById = async (req, res) => {
 };
 
 
+const getCatAllProducts = async (req, res) => {
+      // console.log("Query:", req.query); // <-- yeh dekho kya aa raha
+
+  try {
+    const { category } = req.query;
+    let filter = {};
+    if (category) {
+      filter.category = category;
+    }
+
+    const products = await productModel.find(filter).populate("category");
+
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong", error });
+  }
+};
+
+const addReview = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const { rating, comment, name, userId } = req.body;
+
+    const product = await productModel.findById(productId);
+    if (!product) return res.status(404).json({ error: "Product not found" });
+
+    product.reviews.push({ rating, comment, name, userId });
+    await product.save();
+
+    res.json({ success: true, message: "Review added successfully!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+// DELETE Review by user
+const deleteReview = async (req, res) => {
+  try {
+    const { productId, userId } = req.params;
+
+    const product = await productModel.findById(productId);
+    if (!product) return res.status(404).json({ error: "Product not found" });
+
+    // Filter reviews - remove only review by userId
+    const updatedReviews = product.reviews.filter(
+      (rev) => rev.userId.toString() !== userId
+    );
+
+    product.reviews = updatedReviews;
+    await product.save();
+
+    res.json({ success: true, message: "Review deleted successfully!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+const getAllReviews = async (req, res) => {
+  try {
+    const products = await productModel.find().select("productName reviews");
+    const allReviews = [];
+
+    products.forEach((product) => {
+      product.reviews.forEach((review) => {
+        allReviews.push({
+          productId: product._id,
+          productName: product.productName,
+          ...review._doc, // userId, comment, rating, name, _id
+        });
+      });
+    });
+
+    res.json({ success: true, reviews: allReviews });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
 module.exports = {
   addProduct,
+  addReview,
   deleteProduct,
+  deleteReview,
   getProductById,
+  getCatAllProducts,
   getAllProducts,
+  getAllReviews,
   updateProduct,
 };

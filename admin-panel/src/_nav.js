@@ -121,6 +121,54 @@ const _nav = [
   },
   {
     component: CNavGroup,
+    name: 'Banner',
+    to: '/base',
+    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    items: [
+      // {
+      //   component: CNavItem,
+      //   name: 'Accordion',
+      //   to: '/base/accordion',
+      // },
+      {
+        component: CNavItem,
+        name: 'Add Banner',
+        to: '/base/createBanner',
+      },
+      {
+        component: CNavItem,
+        name: 'View Banner',
+        to: '/base/ViewBanner',
+      },
+   
+    
+    
+    ],
+  },
+  {
+    component: CNavGroup,
+    name: 'Reviews',
+    to: '/base',
+    icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,
+    items: [
+      // {
+      //   component: CNavItem,
+      //   name: 'Accordion',
+      //   to: '/base/accordion',
+      // },
+   
+      {
+        component: CNavItem,
+        name: 'All reviews',
+        to: '/base/allReviews',
+      },
+   
+    
+    
+    ],
+  },
+  {
+    component: CNavGroup,
     name: 'Cart',
     to: '/base',
     icon: <CIcon icon={cilPuzzle} customClassName="nav-icon" />,

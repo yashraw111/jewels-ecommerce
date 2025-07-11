@@ -32,6 +32,16 @@ const productSchema = new mongoose.Schema(
       enum: ["XS", "S", "M", "L", "XL"],
       required: true,
     },
+    reviews: [
+  {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    name: String,
+    rating: Number,
+    comment: String,
+    createdAt: { type: Date, default: Date.now }
+  }
+]
+,
     images: [
       {
         type: String, // Cloudinary URLs

@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Container from "./Container";
 import Marquee from "react-fast-marquee";
+import { useNavigate } from "react-router-dom";
 
 const CategorySection = () => {
   const [categories, setCategories] = useState([]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     axios
       .get(`${import.meta.env.VITE_BASE_URL_CAT}`)
@@ -31,6 +32,7 @@ const CategorySection = () => {
             {categories.map((item, index) => (
               <div
                 key={index}
+                onClick={() => navigate(`/categoryPr/${item._id}`)}
                 className="w-40 mx-3 cursor-pointer hover:scale-105 transition-transform"
               >
                 <img

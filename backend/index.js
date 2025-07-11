@@ -6,6 +6,10 @@ const AuthRoute = require("./routes/Auth.route")
 const AdminRoute = require("./routes/Admin.route")
 const CatRoute  = require("./routes/category.route")
 const ProductRoute  = require("./routes/product.route")
+const CartRoute  = require("./routes/Cart.route")
+const BannerRoute  = require("./routes/Banner.route")
+// const PaymentRoute  = require("./routes/payment.routes")
+
 dotenv.config()
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
@@ -31,6 +35,9 @@ app.use("/api/auth/",AuthRoute)
 app.use("/api/category/",CatRoute)
 app.use("/api/admin/",AdminRoute)
 app.use("/api/product/",ProductRoute)
+app.use("/api/cart/",CartRoute)
+app.use("/api/banners/",BannerRoute)
+// app.use("/api/payment", PaymentRoute);
 
 
 require("./config/db").main()
