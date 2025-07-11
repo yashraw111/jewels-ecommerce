@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
@@ -11,31 +11,56 @@ import ContactUs from './pages/ContactUs';
 import Login from './pages/Login';
 import Signup from './pages/SignUp';
 import ProductDetail from './pages/ProductDetail';
+
+const Loader = ({ show }) => {
+  return (
+    <div
+      className={`
+        fixed inset-0 z-[9999] flex items-center justify-center 
+        bg-white transition-opacity duration-700 
+        ${show ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
+      `}
+    >
+      <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-purple-600 border-solid"></div>
+    </div>
+  );
+};
+
+
 const AppContent = () => {
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
+
   const hideLayoutOn = ['/login', '/signup'];
   const shouldHide = hideLayoutOn.includes(location.pathname);
 
+  useEffect(() => {
+    setLoading(true);
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 1200); // Total loading time with transition
+    return () => clearTimeout(timeout);
+  }, [location]);
+
   return (
     <>
+      <Loader show={loading} />
       {!shouldHide && <Header />}
-
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/products' element={<AllProduct />} />
         <Route path="/product/:id" element={<ProductDetail />} />
-
         <Route path='/category' element={<Category />} />
         <Route path='/about' element={<About />} />
         <Route path='/contact' element={<ContactUs />} />
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
       </Routes>
-
       {!shouldHide && <Footer />}
     </>
   );
 };
+
 
 const App = () => {
   return (

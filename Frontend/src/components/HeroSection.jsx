@@ -1,5 +1,12 @@
-import React, { useEffect, useState } from "react";
-import HeroImage1 from "../assets/images/woman-s-arm-wearing-jewelry.png.jpg";
+import React from "react"
+import { Swiper, SwiperSlide } from "swiper/react"
+import { Navigation, Pagination, Autoplay } from "swiper/modules"
+
+import "swiper/css"
+import "swiper/css/navigation"
+import "swiper/css/pagination"
+
+import HeroImage1 from "../assets/images/woman-s-arm-wearing-jewelry.png.jpg"
 
 const slides = [
   {
@@ -17,74 +24,75 @@ const slides = [
     title: "Luxury That Tells a Story",
     subtitle: "Jewelry that defines your personality",
   },
-];
+]
 
 const HeroSection = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <div className="relative w-full h-[80vh] overflow-hidden">
-      <div
-        className="flex transition-transform duration-1000 ease-in-out"
-        style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+    <div className="relative w-full h-[92vh] overflow-hidden">
+      <Swiper
+        modules={[Navigation, Pagination, Autoplay]}
+        spaceBetween={0}
+        slidesPerView={1}
+        navigation
+        pagination={{ clickable: true }}
+        autoplay={{ delay: 4000 }}
+        loop={true}
+        className="h-full"
       >
         {slides.map((slide, index) => (
-          <div key={index} className="w-full flex-shrink-0 h-[80vh] relative">
-            <img
-              src={slide.image}
-              alt={`Slide ${index}`}
-              className="w-full h-full object-cover brightness-50"
-            />
-            <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center px-4">
-              <h2 className="text-3xl md:text-5xl font-extrabold mb-4 drop-shadow-md">
-                {slide.title}
-              </h2>
-              <p className="text-lg md:text-2xl mb-6 drop-shadow-md">
-                {slide.subtitle}
-              </p>
-             <button
-  className="bg-white text-black font-semibold px-6 py-3 rounded-full shadow-lg 
-             transition-all duration-300 transform hover:scale-105 hover:bg-purple-600 
-             hover:text-white hover:shadow-xl cursor-pointer"
->
-  Shop Now
-</button>
-
+          <SwiperSlide key={index}>
+            <div className="relative w-full h-[92vh]">
+              <img
+                src={slide.image}
+                alt={`Slide ${index}`}
+                className="w-full h-full object-cover brightness-50"
+              />
+              <div className="absolute inset-0 flex flex-col justify-center items-center text-white text-center px-4">
+                <h2 className="text-3xl md:text-5xl font-extrabold mb-4 drop-shadow-md">
+                  {slide.title}
+                </h2>
+                <p className="text-lg md:text-2xl mb-6 drop-shadow-md">
+                  {slide.subtitle}
+                </p>
+                <button className="bg-white text-black font-semibold px-6 py-3 rounded-full shadow-lg hover:scale-105 hover:bg-purple-600 hover:text-white transition-all duration-300">
+                  Shop Now
+                </button>
+              </div>
             </div>
-          </div>
+          </SwiperSlide>
         ))}
-      </div>
+      </Swiper>
 
-      {/* Navigation Buttons */}
-      <button
-        onClick={prevSlide}
-        className="absolute cursor-pointer top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white px-3 py-2 rounded-full hover:bg-opacity-70 z-20"
-      >
-        &#10094;
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute cursor-pointer top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-50 text-white px-3 py-2 rounded-full hover:bg-opacity-70 z-20"
-      >
-        &#10095;
-      </button>
+      {/* 👉 Custom Swiper Arrows (Override Default Styles) */}
+      <style>
+        {`
+          .swiper-button-prev,
+          .swiper-button-next {
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            width: 48px;
+            height: 48px;
+            border-radius: 9999px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 50;
+            transition: background 0.3s ease;
+          }
+
+          .swiper-button-prev:hover,
+          .swiper-button-next:hover {
+            background: #9333ea; /* Purple */
+          }
+
+          .swiper-button-prev::after,
+          .swiper-button-next::after {
+            font-size: 18px;
+            font-weight: bold;
+          }
+        `}
+      </style>
     </div>
-  );
-};
+  )
+}
 
-export default HeroSection;
+export default HeroSection
