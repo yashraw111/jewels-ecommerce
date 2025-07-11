@@ -13,7 +13,8 @@ app.use(express.urlencoded({extended:true}))
 //     origin: "*", // Specific origin
 //     credentials: true // Allow credentials
 //   }));
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000']
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000',  'https://jewels-ecommerce-frontend.onrender.com',
+  'https://jewels-ecommerce-admin.onrender.com']
 
 app.use(cors({
   origin: function (origin, callback) {
