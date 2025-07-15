@@ -13,14 +13,13 @@ const CreateProduct = React.lazy(() => import('./components/Crud/Product/CreateP
 const createBanner = React.lazy(() => import('./components/Crud/Banner/AddBanner.js'))
 const ViewBanner = React.lazy(() => import('./components/Crud/Banner/ViewBanner.js'))
 const allReviews = React.lazy(() => import('./components/Crud/Reviews/AdminAllReviews.jsx'))
+const ContactList = React.lazy(() => import('./components/Crud/Contact/ContactList.jsx'))
 
 const ViewProductList = React.lazy(() => import('./components/Crud/Product/ViewProductList'))
 const UpdateProject = React.lazy(() => import('./components/Crud/Product/UpdateProject.js'))
 const AddCategory = React.lazy(() => import('./components/Crud/Category/AddCategory'))
 const ViewCategory = React.lazy(() => import('./components/Crud/Category/ViewCategory'))
 const UpdateCategory = React.lazy(() => import('./components/Crud/Category/UpdateCategory.js'))
-
-
 
 const CreateSubCategory = React.lazy(
   () => import('./components/Crud/SubCategory/CreateSubCategory.js'),
@@ -84,6 +83,7 @@ const routes = [
   { path: '/base/createBanner', exact: true, name: 'createBanner', element: createBanner },
   { path: '/base/ViewBanner', exact: true, name: 'ViewBanner', element: ViewBanner },
   { path: '/base/allReviews', exact: true, name: 'ViewBanner', element: allReviews },
+  { path: '/base/ContactList', exact: true, name: 'ViewBanner', element: ContactList },
 
   { path: '/base/ViewList', exact: true, name: 'CreateProject', element: ViewProductList },
   { path: '/UpdateProduct/:id', exact: true, name: 'UpdateProject', element: UpdateProject },

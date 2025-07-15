@@ -1,6 +1,8 @@
+
+// controllers/product.controller.js
 const productModel = require("../models/product.model");
 
-const addProduct = async (req, res, next) => {
+const addProduct = async (req, res) => {
   try {
     const {
       CateGory,
@@ -16,11 +18,10 @@ const addProduct = async (req, res, next) => {
       discount,
     } = req.body;
 
-    // ✅ images ka array banao cloudinary path se
     const images = req.files.map((file) => file.path);
 
     const newProduct = new productModel({
-      category: CateGory, // assuming CateGory == category ID
+      category: CateGory,
       productName,
       material,
       size,
@@ -31,41 +32,28 @@ const addProduct = async (req, res, next) => {
       alreadySold,
       available,
       discount,
-      images, // ✅ array of image URLs
+      images,
     });
 
     const saved = await newProduct.save();
-
-    res.status(201).json({
-      success: true,
-      message: "Product created successfully",
-      data: saved,
-    });
+    res.status(201).json({ success: true, message: "Product created successfully", data: saved });
   } catch (error) {
     console.error("Product creation error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-
-// ✅ DELETE product
 const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
     await productModel.findByIdAndDelete(id);
-    res
-      .status(200)
-      .json({ success: true, message: "Product deleted successfully" });
+    res.status(200).json({ success: true, message: "Product deleted successfully" });
   } catch (error) {
     console.error("Delete Product Error:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-// ✅ UPDATE product
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -83,7 +71,6 @@ const updateProduct = async (req, res) => {
       discount,
     } = req.body;
 
-    // ✅ Cloudinary image paths
     const images = req.files ? req.files.map((file) => file.path) : [];
 
     const updatedProduct = await productModel.findByIdAndUpdate(
@@ -92,7 +79,7 @@ const updateProduct = async (req, res) => {
         category: CateGory,
         productName,
         material,
-        sizes: Array.isArray(size) ? size : [size], // ensure it's an array
+        sizes: Array.isArray(size) ? size : [size],
         WithoutDiscountPrice,
         productPrice,
         rate,
@@ -100,18 +87,12 @@ const updateProduct = async (req, res) => {
         alreadySold,
         quantity: available,
         discount,
-        ...(images.length > 0 && { images }), // only update images if provided
+        ...(images.length > 0 && { images }),
       },
       { new: true }
     );
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Product updated",
-        data: updatedProduct,
-      });
+    res.status(200).json({ success: true, message: "Product updated", data: updatedProduct });
   } catch (error) {
     console.error("Update Product Error:", error);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -128,50 +109,45 @@ const getAllProducts = async (req, res) => {
   }
 };
 
-// ✅ Get single product by ID
 const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-
-    // Find product by ID
     const product = await productModel.findById(id);
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: product,
-    });
+    if (!product) return res.status(404).json({ success: false, message: "Product not found" });
+    res.status(200).json({ success: true, data: product });
   } catch (error) {
     console.error("Get Single Product Error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-
 const getCatAllProducts = async (req, res) => {
-      // console.log("Query:", req.query); // <-- yeh dekho kya aa raha
-
   try {
     const { category } = req.query;
     let filter = {};
-    if (category) {
-      filter.category = category;
-    }
-
+    if (category) filter.category = category;
     const products = await productModel.find(filter).populate("category");
-
     res.status(200).json(products);
   } catch (error) {
     res.status(500).json({ message: "Something went wrong", error });
+  }
+};
+
+const getRelatedProducts = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const currentProduct = await productModel.findById(id);
+    if (!currentProduct) return res.status(404).json({ message: "Product not found" });
+
+    const related = await productModel.find({
+      _id: { $ne: id },
+      category: currentProduct.category,
+    }).limit(4); // fetch max 4 related
+
+    res.status(200).json({ success: true, products: related });
+  } catch (err) {
+    console.error("Related Product Error:", err);
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -179,52 +155,67 @@ const addReview = async (req, res) => {
   try {
     const { productId } = req.params;
     const { rating, comment, name, userId } = req.body;
-
     const product = await productModel.findById(productId);
     if (!product) return res.status(404).json({ error: "Product not found" });
-
     product.reviews.push({ rating, comment, name, userId });
     await product.save();
-
     res.json({ success: true, message: "Review added successfully!" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-// DELETE Review by user
+
 const deleteReview = async (req, res) => {
   try {
-    const { productId, userId } = req.params;
-
+    const { productId, reviewId } = req.params;
     const product = await productModel.findById(productId);
     if (!product) return res.status(404).json({ error: "Product not found" });
-
-    // Filter reviews - remove only review by userId
-    const updatedReviews = product.reviews.filter(
-      (rev) => rev.userId.toString() !== userId
-    );
-
-    product.reviews = updatedReviews;
+    product.reviews = product.reviews.filter((rev) => rev._id.toString() !== reviewId);
     await product.save();
-
     res.json({ success: true, message: "Review deleted successfully!" });
   } catch (err) {
+    console.error("Delete review error:", err);
     res.status(500).json({ error: err.message });
   }
 };
+
 const getAllReviews = async (req, res) => {
   try {
     const products = await productModel.find().select("productName reviews");
     const allReviews = [];
-
     products.forEach((product) => {
       product.reviews.forEach((review) => {
         allReviews.push({
           productId: product._id,
           productName: product.productName,
-          ...review._doc, // userId, comment, rating, name, _id
+          ...review._doc,
         });
       });
+    });
+    res.json({ success: true, reviews: allReviews });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const getCusAllReviews = async (req, res) => {
+  try {
+    const { rating } = req.query; // e.g. /reviews/all?rating=5
+    const filterRating = parseInt(rating) || 5; // default 5
+
+    const products = await productModel.find().select("productName reviews");
+
+    const allReviews = [];
+    products.forEach((product) => {
+      product.reviews
+        .filter((review) => review.rating === filterRating)
+        .forEach((review) => {
+          allReviews.push({
+            productId: product._id,
+            productName: product.productName,
+            ...review._doc,
+          });
+        });
     });
 
     res.json({ success: true, reviews: allReviews });
@@ -234,14 +225,40 @@ const getAllReviews = async (req, res) => {
 };
 
 
+
+const getAllCategoriesWithProductCount = async (req, res) => {
+  try {
+    const categories = await Category.find();
+
+    const categoriesWithCount = await Promise.all(
+      categories.map(async (cat) => {
+        const count = await Product.countDocuments({ category: cat._id });
+        return {
+          ...cat._doc,
+          productCount: count,
+        };
+      })
+    );
+
+    res.status(200).json(categoriesWithCount);
+  } catch (err) {
+    console.error("Category fetch error", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 module.exports = {
   addProduct,
-  addReview,
   deleteProduct,
-  deleteReview,
+  getAllCategoriesWithProductCount,
+  updateProduct,
+  getAllProducts,
   getProductById,
   getCatAllProducts,
-  getAllProducts,
+  addReview,
+  getCusAllReviews,
+  deleteReview,
   getAllReviews,
-  updateProduct,
+  getRelatedProducts
 };

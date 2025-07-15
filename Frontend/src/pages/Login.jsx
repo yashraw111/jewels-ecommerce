@@ -7,6 +7,8 @@ import { toast, ToastContainer } from "react-toastify";
 import Bracelet from "../assets/images/Bracelet.jpg";
 import { setUser } from "../redux/UserSlice";
 import { useNavigate } from "react-router-dom";
+import { auth, provider } from "../helper/firebase";
+import { signInWithPopup } from "firebase/auth";
 
 const Login = () => {
   const {
@@ -33,6 +35,28 @@ const Login = () => {
       toast.error(err.response?.data?.message || "Login failed");
     }
   };
+
+  
+const handleGoogleLogin = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    // Step 2: Send Google user data to backend
+    const res = await axios.post("http://localhost:8000/api/auth/google-login", {
+      name: user.displayName,
+      email: user.email,
+      avatar: user.photoURL,
+    }, { withCredentials: true });
+
+    dispatch(setUser(res.data.user));
+    toast.success("Login with Google successful");
+    redirect("/");
+  } catch (err) {
+    console.error(err);
+    toast.error("Google login failed");
+  }
+};
   return (
     <div className="flex min-h-screen">
       <ToastContainer />
@@ -84,6 +108,13 @@ const Login = () => {
           <button className="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition">
             Log In
           </button>
+          <button
+  onClick={handleGoogleLogin}
+  className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 transition"
+>
+  Continue with Google
+</button>
+
 
           <div className="text-center text-sm mt-2">
             Don't have an account?{" "}

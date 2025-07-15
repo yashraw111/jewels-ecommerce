@@ -10,12 +10,10 @@ const userSchema = new mongoose.Schema({
   },
   fullName: {
     type: String,
-    required: true,
     trim: true,
   },
   name: {
     type: String,
-    required: true,
     trim: true,
   },
   email: {
@@ -36,8 +34,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  wishlist: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Product",
+  }],
 });
 
 const User = mongoose.model("User", userSchema, "users");
 
-module.exports = User; // ✅ Yeh karo
+module.exports = User;

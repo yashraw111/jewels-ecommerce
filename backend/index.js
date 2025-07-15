@@ -8,7 +8,10 @@ const CatRoute  = require("./routes/category.route")
 const ProductRoute  = require("./routes/product.route")
 const CartRoute  = require("./routes/Cart.route")
 const BannerRoute  = require("./routes/Banner.route")
-// const PaymentRoute  = require("./routes/payment.routes")
+const orderRoutes = require("./routes/orderRoutes");
+const paymentRoutes = require("./routes/payment.routes")
+const wishlistRoute = require('./routes/Wishlist.route');
+const contactRoutes = require('./routes/contact.route');
 
 dotenv.config()
 app.use(express.json())
@@ -37,6 +40,11 @@ app.use("/api/admin/",AdminRoute)
 app.use("/api/product/",ProductRoute)
 app.use("/api/cart/",CartRoute)
 app.use("/api/banners/",BannerRoute)
+app.use("/api/orders", orderRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use('/api/wishlist', wishlistRoute);
+app.use("/api/", contactRoutes); // 👈 Use
+
 // app.use("/api/payment", PaymentRoute);
 
 

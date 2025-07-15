@@ -7,95 +7,83 @@ import {
   CTableBody,
   CTableDataCell,
   CTableHead,
-  CTableRow
+  CTableRow,
+  CFormSelect
 } from '@coreui/react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllCarts, deleteCartItem } from '../CartSlice';
-import Swal from 'sweetalert2';
+import { fetchAllOrders, updateOrderStatus } from '../OrderSlice';
 
-const CartList = () => {
+const OrderList = () => {
   const dispatch = useDispatch();
-  const { cartItems, loading } = useSelector((state) => state.cartItems);
+  const { orders, loading } = useSelector(state => state.orders);
 
   useEffect(() => {
-    dispatch(fetchAllCarts());
+    dispatch(fetchAllOrders());
   }, [dispatch]);
 
-  const handleDelete = (id) => {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you want to remove this item from cart?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deleteCartItem(id));
-        Swal.fire('Deleted!', 'Cart item has been deleted.', 'success');
-      }
-    });
+  const handleStatusChange = (orderId, newStatus) => {
+    dispatch(updateOrderStatus({ orderId, status: newStatus }));
   };
+console.log(orders)
 
   return (
-    <>
-      <CRow>
-        <CCol xs={12}>
-          <h1>All Cart Items</h1>
-          <CTable className="table table-bordered mt-3">
-            <CTableHead>
+    <CRow>
+      <CCol xs={12}>
+        <h2>📦 All Orders</h2>
+        <CTable className="table table-bordered mt-3">
+          <CTableHead>
+            <CTableRow>
+              <CTableDataCell>#</CTableDataCell>
+              <CTableDataCell>User</CTableDataCell>
+              <CTableDataCell>Items</CTableDataCell>
+              <CTableDataCell>Total</CTableDataCell>
+              <CTableDataCell>Status</CTableDataCell>
+              <CTableDataCell>Change Status</CTableDataCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            {loading ? (
               <CTableRow>
-                <CTableDataCell>S.No</CTableDataCell>
-                <CTableDataCell>User</CTableDataCell>
-                <CTableDataCell>Product</CTableDataCell>
-                <CTableDataCell>Image</CTableDataCell>
-                <CTableDataCell>Quantity</CTableDataCell>
-                <CTableDataCell>Price</CTableDataCell>
-                <CTableDataCell>Action</CTableDataCell>
+                <CTableDataCell colSpan={6}>Loading...</CTableDataCell>
               </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {loading ? (
-                <CTableRow>
-                  <CTableDataCell colSpan={7}>Loading...</CTableDataCell>
+            ) : orders.length > 0 ? (
+              orders.map((order, index) => (
+                <CTableRow key={order._id}>
+                  <CTableDataCell>{index + 1}</CTableDataCell>
+                  <CTableDataCell>{order.user?.name || "Unknown"}</CTableDataCell>
+                  <CTableDataCell>
+                    {order.items.map((item, idx) => (
+                      <div key={idx}>
+                        {item.productId?.productName} (x{item.quantity})<br />
+                      </div>
+                    ))}
+                  </CTableDataCell>
+                  <CTableDataCell>₹{order.totalPrice}</CTableDataCell>
+                  <CTableDataCell>{order.status}</CTableDataCell>
+                  <CTableDataCell>
+                  <CFormSelect
+  value={order.status}
+  onChange={(e) => handleStatusChange(order._id, e.target.value)}
+>
+  <option value="Processing">Processing</option>
+  <option value="Shipped">Shipped</option>
+  <option value="Out for delivery">Out for delivery</option> {/* ✅ added */}
+  <option value="Delivered">Delivered</option>
+</CFormSelect>
+
+                  </CTableDataCell>
                 </CTableRow>
-              ) : cartItems?.length > 0 ? (
-                cartItems?.map((item, index) => (
-                  <CTableRow key={item._id}>
-                    <CTableDataCell>{index + 1}</CTableDataCell>
-                    <CTableDataCell>{item?.user?.name || "Unknown"}</CTableDataCell>
-                    <CTableDataCell>{item?.product?.productName}</CTableDataCell>
-                    <CTableDataCell>
-                      <img
-                        src={item?.product?.productImage}
-                        alt={item?.product?.productName}
-                        width={80}
-                      />
-                    </CTableDataCell>
-                    <CTableDataCell>{item.quantity}</CTableDataCell>
-                    <CTableDataCell>${item?.product?.productPrice}</CTableDataCell>
-                    <CTableDataCell>
-                      <CButton
-                        color="danger"
-                        onClick={() => handleDelete(item._id)}
-                      >
-                        <i className="fa fa-trash"></i>
-                      </CButton>
-                    </CTableDataCell>
-                  </CTableRow>
-                ))
-              ) : (
-                <CTableRow>
-                  <CTableDataCell colSpan={7}>No cart items found.</CTableDataCell>
-                </CTableRow>
-              )}
-            </CTableBody>
-          </CTable>
-        </CCol>
-      </CRow>
-    </>
+              ))
+            ) : (
+              <CTableRow>
+                <CTableDataCell colSpan={6}>No orders found.</CTableDataCell>
+              </CTableRow>
+            )}
+          </CTableBody>
+        </CTable>
+      </CCol>
+    </CRow>
   );
 };
 
-export default CartList;
+export default OrderList;

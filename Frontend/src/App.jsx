@@ -14,6 +14,9 @@ import ProductDetail from './pages/ProductDetail';
 import CartPage from './pages/CartPage';
 import CategoryProducts from './components/CategoryProducts';
 import CheckoutPage from './pages/CheckoutPage';
+import TrackOrder from './pages/TrackOrder';
+import ViewWishlist from './pages/ViewWishlist';
+// import Wishlist from './pages/Wishlist';
 
 const Loader = ({ show }) => {
   return (
@@ -59,8 +62,10 @@ const AppContent = () => {
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
         <Route path='/cartPage' element={<CartPage />} />
+        <Route path='/order-success' element={<TrackOrder />} />
           <Route path="/categoryPr/:id" element={<CategoryProducts />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/wishList" element={<ViewWishlist />} />
 
       </Routes>
       {!shouldHide && <Footer />}

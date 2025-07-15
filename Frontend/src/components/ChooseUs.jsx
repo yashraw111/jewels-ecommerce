@@ -1,28 +1,28 @@
 import React from "react";
+import { Gem, Palette, ShieldCheck, CreditCard } from "lucide-react"; // Icons
 
 const features = [
   {
-    number: "1",
+    icon: <Gem size={28} className="text-purple-600" />,
     title: "Premium Quality",
     description: "100% certified gold jewelry",
   },
   {
-    number: "2",
+    icon: <Palette size={28} className="text-purple-600" />,
     title: "Unique Designs",
     description: "Handcrafted by skilled artisans",
   },
   {
-    number: "3",
+    icon: <ShieldCheck size={28} className="text-purple-600" />,
     title: "Lifetime Warranty",
     description: "On all our jewelry pieces",
   },
   {
-    number: "4",
+    icon: <CreditCard size={28} className="text-purple-600" />,
     title: "Secure Payments",
     description: "Multiple payment options",
   },
 ];
-
 const ChooseUs = () => {
   return (
     <section className="bg-[#f1f6fd] py-16 px-4">
@@ -35,10 +35,10 @@ const ChooseUs = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="border border-purple-100 rounded-md p-6 bg-white text-center"
+              className="border border-purple-100 rounded-md p-6 bg-white text-center hover:shadow-lg transition"
             >
-              <div className="bg-purple-100 w-14 h-14 mx-auto rounded-full flex items-center justify-center text-purple-700 font-bold text-lg mb-4">
-                {feature.number}
+              <div className="bg-purple-100 w-14 h-14 mx-auto rounded-full flex items-center justify-center mb-4">
+                {feature.icon}
               </div>
               <h3 className="font-semibold mb-1">{feature.title}</h3>
               <p className="text-sm text-gray-500">{feature.description}</p>

@@ -47,11 +47,12 @@ import reel2 from "../assets/videos/video2.mp4";
 import reel3 from "../assets/videos/video2.mp4";
 
 const reels = [
-  { id: 1, video: reel1, productId: "p1" },
-  { id: 2, video: reel2, productId: "p2" },
-  { id: 3, video: reel3, productId: "p3" },
+  { id: 1, video: reel2, productId: "p1" },
+  { id: 2, video: reel1, productId: "p2" },
+  { id: 3, video: reel2, productId: "p2" },
+  { id: 4, video: reel1, productId: "p3" },
+  { id: 5, video: reel3, productId: "p3" },
 ];
-
 const InstagramGallery = () => {
   const addToCart = (productId) => {
     // 👇 Replace this with your actual Redux/Context action

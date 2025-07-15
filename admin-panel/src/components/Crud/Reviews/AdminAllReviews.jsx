@@ -13,26 +13,29 @@ const AdminAllReviews = () => {
       console.error("Failed to load reviews", error);
     }
   };
+  console.log(reviews)
 
-  const deleteReview = async (productId, userId) => {
-    const confirm = await Swal.fire({
-      title: "Delete this review?",
-      text: "It will be removed permanently!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-    });
+const deleteReview = async (productId, reviewId) => {
+  const confirm = await Swal.fire({
+    title: "Delete this review?",
+    text: "It will be removed permanently!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete it!",
+  });
 
-    if (confirm.isConfirmed) {
-      try {
-        await axios.delete(`${import.meta.env.VITE_BASE_URL_PRO}/${productId}/review/${userId}`);
-        Swal.fire("Deleted!", "Review deleted.", "success");
-        fetchReviews();
-      } catch (error) {
-        Swal.fire("Error!", "Failed to delete review.", "error");
-      }
+  if (confirm.isConfirmed) {
+    try {
+      await axios.delete(`${import.meta.env.VITE_BASE_URL_PRO}/${productId}/review/${reviewId}`);
+      Swal.fire("Deleted!", "Review deleted.", "success");
+      fetchReviews();
+    } catch (error) {
+      Swal.fire("Error!", "Failed to delete review.", "error");
     }
-  };
+  }
+};
+console.log(reviews)
+
 
   useEffect(() => {
     fetchReviews();
@@ -66,7 +69,7 @@ const AdminAllReviews = () => {
                 <td>
                   <button
                     className="btn btn-danger"
-                    onClick={() => deleteReview(r.productId, r.userId)}
+                    onClick={() => deleteReview(r.productId, r._id)}
                   >
                     <i className="fa-solid fa-trash"></i>
                   </button>

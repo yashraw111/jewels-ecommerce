@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Heart } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function AllProducts() {
   const [filters, setFilters] = useState({
@@ -14,13 +17,26 @@ export default function AllProducts() {
   const [categories, setCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 6;
+  const user = useSelector((state) => state.user.user);
+  const [wishlist, setWishlist] = useState(user?.wishlist || []);
 
-  // ✅ Fetch Products
+  // Shuffle function (Fisher-Yates)
+  function shuffleArray(array) {
+    let arr = array.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  // Fetch Products & shuffle on fetch
   useEffect(() => {
     async function fetchProducts() {
       try {
         const res = await axios.get(`${import.meta.env.VITE_BASE_URL_PRO}`);
-        setAllProducts(res.data);
+        const shuffledProducts = shuffleArray(res.data);
+        setAllProducts(shuffledProducts);
       } catch (err) {
         console.error("Failed to fetch products:", err);
       }
@@ -28,12 +44,13 @@ export default function AllProducts() {
     fetchProducts();
   }, []);
 
-  // ✅ Fetch Categories
+  // Fetch Categories
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     async function fetchCategories() {
       try {
         const res = await axios.get(`${import.meta.env.VITE_BASE_URL_CAT}`);
-        setCategories(res.data); // [{ _id, cat_name }]
+        setCategories(res.data);
       } catch (err) {
         console.error("Failed to fetch categories:", err);
       }
@@ -57,14 +74,33 @@ export default function AllProducts() {
     setCurrentPage(1);
   };
 
+  const handleWishlistToggle = async (productId) => {
+    if (!user) {
+      return toast.warning("Please login to add product to wishlist");
+    }
+
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/wishlist/toggle`, {
+        userId: user._id,
+        productId,
+      });
+
+      setWishlist(res.data.wishlist);
+      toast.success(res.data.message);
+    } catch (err) {
+      console.error("Wishlist toggle failed:", err);
+      toast.error("Failed to update wishlist");
+    }
+  };
+
+  // Filter products based on filters
   const filteredProducts = allProducts.filter((product) => {
     const inCategory =
       filters.categories.length === 0 ||
-      filters.categories.includes(product.category); // ✅ category is ID
+      filters.categories.includes(product.category);
 
     const inMaterial =
-      filters.materials.length === 0 ||
-      filters.materials.includes(product.material);
+      filters.materials.length === 0 || filters.materials.includes(product.material);
 
     const inPriceRange =
       product.productPrice >= filters.minPrice &&
@@ -73,6 +109,7 @@ export default function AllProducts() {
     return inCategory && inMaterial && inPriceRange;
   });
 
+  // Pagination calculations
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   const displayedProducts = filteredProducts.slice(
     (currentPage - 1) * productsPerPage,
@@ -89,7 +126,8 @@ export default function AllProducts() {
             <input
               type="checkbox"
               onChange={() => handleCheckbox("categories", cat._id)}
-            /> {cat.cat_name}
+            />{" "}
+            {cat.cat_name}
           </div>
         ))}
 
@@ -118,7 +156,8 @@ export default function AllProducts() {
             <input
               type="checkbox"
               onChange={() => handleCheckbox("materials", mat)}
-            /> {mat}
+            />{" "}
+            {mat}
           </div>
         ))}
       </aside>
@@ -126,32 +165,48 @@ export default function AllProducts() {
       {/* Product Grid */}
       <div className="flex-1">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {displayedProducts.map((product) => (
-            <div
-              key={product._id}
-              className="border border-purple-200 shadow p-4 text-center"
+          {displayedProducts.map((product) => {
+            const isLiked = wishlist.includes(product._id);
+            return (
+              <div
+                key={product._id}
+                className="border border-purple-200 shadow p-4 text-center relative group"
               >
-              
-            <Link to={`/product/${product._id}`}>
-              <img
-                src={product.images?.[0] || ""}
-                alt={product.productName}
-                className="w-full h-48 object-cover mb-2"
-              />
-                  </Link>
-              <h3 className="font-semibold">{product.productName}</h3>
-              <p className="text-purple-600 font-bold">
-                ₹ {product.productPrice?.toFixed(2)}
-              </p>
-            <Link to={`/product/${product._id}`}>
+                {/* Wishlist Heart */}
+                <div
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer"
+                  onClick={() => handleWishlistToggle(product._id)}
+                >
+                  <div
+                    className={`p-1 rounded-full ${
+                      isLiked ? "bg-red-500" : "bg-gray-200"
+                    }`}
+                  >
+                    <Heart strokeWidth={3} size={20} className="text-white" />
+                  </div>
+                </div>
 
-              <button className="mt-2 bg-purple-600 cursor-pointer text-white px-4 py-1 ">
-                Add to Cart
-              </button>
-                  </Link>
+                <Link to={`/product/${product._id}`}>
+                  <img
+                    src={product.images?.[0] || ""}
+                    alt={product.productName}
+                    className="w-full h-48 object-cover mb-2"
+                  />
+                </Link>
 
-            </div>
-          ))}
+                <h3 className="font-semibold">{product.productName}</h3>
+                <p className="text-purple-600 font-bold">
+                  ₹ {product.productPrice?.toFixed(2)}
+                </p>
+
+                <Link to={`/product/${product._id}`}>
+                  <button className="mt-2 bg-purple-600 text-white px-4 py-1">
+                    Add to Cart
+                  </button>
+                </Link>
+              </div>
+            );
+          })}
         </div>
 
         {/* Pagination */}
@@ -182,232 +237,3 @@ export default function AllProducts() {
     </div>
   );
 }
-
-
-
-
-// import { useEffect, useState } from "react";
-// import axios from "axios";
-// import { Link } from "react-router-dom";
-// import { useDispatch, useSelector } from "react-redux";
-// import { fetchCart, toggleCart } from "../redux/cartSlice";
-// import { toast } from "react-toastify"; // optional
-
-// export default function AllProducts() {
-//   const [filters, setFilters] = useState({
-//     categories: [],
-//     materials: [],
-//     minPrice: 0,
-//     maxPrice: 200000,
-//   });
-
-//   const dispatch = useDispatch();
-//   const cartItems = useSelector((state) => state.cart.items);
-//   const user = useSelector((state) => state.user.user);
-
-//   console.log(user);
-
-//   const [allProducts, setAllProducts] = useState([]);
-//   const [categories, setCategories] = useState([]);
-//   const [currentPage, setCurrentPage] = useState(1);
-//   const productsPerPage = 6;
-
-//   useEffect(() => {
-//     if (user && user._id) {
-//       dispatch(fetchCart(user._id));
-//     }
-//   }, [dispatch, user]);
-
-//   // ✅ Fetch Products
-//   useEffect(() => {
-//     async function fetchProducts() {
-//       try {
-//         const res = await axios.get(`${import.meta.env.VITE_BASE_URL_PRO}`);
-//         setAllProducts(res.data);
-//       } catch (err) {
-//         console.error("Failed to fetch products:", err);
-//       }
-//     }
-//     fetchProducts();
-//   }, []);
-
-//   // ✅ Fetch Categories
-//   useEffect(() => {
-//     async function fetchCategories() {
-//       try {
-//         const res = await axios.get(`${import.meta.env.VITE_BASE_URL_CAT}`);
-//         setCategories(res.data);
-//       } catch (err) {
-//         console.error("Failed to fetch categories:", err);
-//       }
-//     }
-//     fetchCategories();
-//   }, []);
-
-//   const handleCheckbox = (type, value) => {
-//     setFilters((prev) => {
-//       const updated = prev[type].includes(value)
-//         ? prev[type].filter((v) => v !== value)
-//         : [...prev[type], value];
-//       return { ...prev, [type]: updated };
-//     });
-//     setCurrentPage(1);
-//   };
-
-//   const handlePriceChange = (e) => {
-//     const { name, value } = e.target;
-//     setFilters((prev) => ({ ...prev, [name]: parseInt(value) || 0 }));
-//     setCurrentPage(1);
-//   };
-
-//   const filteredProducts = allProducts.filter((product) => {
-//     const inCategory =
-//       filters.categories.length === 0 ||
-//       filters.categories.includes(product.category);
-
-//     const inMaterial =
-//       filters.materials.length === 0 ||
-//       filters.materials.includes(product.material);
-
-//     const inPriceRange =
-//       product.productPrice >= filters.minPrice &&
-//       product.productPrice <= filters.maxPrice;
-
-//     return inCategory && inMaterial && inPriceRange;
-//   });
-
-//   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-//   const displayedProducts = filteredProducts.slice(
-//     (currentPage - 1) * productsPerPage,
-//     currentPage * productsPerPage
-//   );
-
-//   return (
-//     <div className="flex px-6 py-8 gap-6">
-//       {/* Sidebar */}
-//       <aside className="w-64 border border-purple-200 p-4">
-//         <h2 className="font-bold text-lg mb-2">Categories</h2>
-//         {categories.map((cat) => (
-//           <div key={cat._id}>
-//             <input
-//               type="checkbox"
-//               onChange={() => handleCheckbox("categories", cat._id)}
-//             />{" "}
-//             {cat.cat_name}
-//           </div>
-//         ))}
-
-//         <h2 className="font-bold text-lg mt-6 mb-2">Price Range</h2>
-//         <div className="flex items-center gap-2">
-//           <input
-//             type="number"
-//             name="minPrice"
-//             placeholder="Min"
-//             className="w-1/2 border p-1"
-//             onChange={handlePriceChange}
-//           />
-//           <input
-//             type="number"
-//             name="maxPrice"
-//             placeholder="Max"
-//             className="w-1/2 border p-1"
-//             onChange={handlePriceChange}
-//             defaultValue={200000}
-//           />
-//         </div>
-
-//         <h2 className="font-bold text-lg mt-6 mb-2">Material</h2>
-//         {["18K Gold", "22K Gold", "Rose Gold", "White Gold"].map((mat) => (
-//           <div key={mat}>
-//             <input
-//               type="checkbox"
-//               onChange={() => handleCheckbox("materials", mat)}
-//             />{" "}
-//             {mat}
-//           </div>
-//         ))}
-//       </aside>
-
-//       {/* Product Grid */}
-//       <div className="flex-1">
-//         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-//           {displayedProducts.map((product) => (
-//             <div
-//               key={product._id}
-//               className="border border-purple-200 shadow p-4 text-center"
-//             >
-//               <Link to={`/product/${product._id}`}>
-//                 <img
-//                   src={product.images?.[0] || ""}
-//                   alt={product.productName}
-//                   className="w-full h-48 object-cover mb-2"
-//                 />
-//               </Link>
-//               <h3 className="font-semibold">{product.productName}</h3>
-//               <p className="text-purple-600 font-bold">
-//                 ₹ {product.productPrice?.toFixed(2)}
-//               </p>
-//   <button
-//   className={`mt-2 px-4 py-1 ${
-//     cartItems.some((item) => item.productId._id === product._id)
-//       ? "bg-red-500 text-white"
-//       : "bg-purple-600 text-white"
-//   }`}
-//   onClick={() => {
-//     if (!user || !user._id) {
-//       toast.warning("Please login to add product to cart");
-//       return;
-//     }
-
-//     dispatch(toggleCart({ userId: user._id, productId: product._id }))
-//       .then(() => {
-//         const inCart = cartItems.some(
-//           (item) => item.productId._id === product._id
-//         );
-//         toast.success(inCart ? "Removed from cart" : "Added to cart");
-//         // ✅ Refresh cart to reflect UI immediately
-//         dispatch(fetchCart(user._id));
-//       })
-//       .catch((err) => {
-//         toast.error("Failed to update cart");
-//         console.error("Cart error:", err);
-//       });
-//   }}
-// >
-//   {cartItems.some((item) => item.productId._id === product._id)
-//     ? "Remove from Cart"
-//     : "Add to Cart"}
-// </button>
-
-//             </div>
-//           ))}
-//         </div>
-
-//         {/* Pagination */}
-//         {totalPages > 1 && (
-//           <div className="flex justify-center mt-6 gap-2">
-//             <button
-//               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-//               className="px-4 py-1 border rounded disabled:opacity-50"
-//               disabled={currentPage === 1}
-//             >
-//               Previous
-//             </button>
-//             <span className="px-3 py-1">
-//               Page {currentPage} of {totalPages}
-//             </span>
-//             <button
-//               onClick={() =>
-//                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-//               }
-//               className="px-4 py-1 border rounded disabled:opacity-50"
-//               disabled={currentPage === totalPages}
-//             >
-//               Next
-//             </button>
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }

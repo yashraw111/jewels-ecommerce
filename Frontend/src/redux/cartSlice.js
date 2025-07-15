@@ -1,13 +1,12 @@
+// ✅ cartSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// ✅ Fetch all cart items for a user
 export const fetchCart = createAsyncThunk("cart/fetch", async (userId) => {
   const res = await axios.get(`${import.meta.env.VITE_BASE_URL_CART}/${userId}`);
   return res.data;
 });
 
-// ✅ Toggle cart add/remove
 export const toggleCart = createAsyncThunk(
   "cart/toggle",
   async ({ userId, productId, size, material, quantity }, { dispatch }) => {
@@ -22,7 +21,6 @@ export const toggleCart = createAsyncThunk(
   }
 );
 
-// ✅ Delete a specific cart item
 export const deleteCartItem = createAsyncThunk(
   "cart/deleteItem",
   async ({ cartItemId, userId }, { dispatch }) => {
@@ -30,6 +28,11 @@ export const deleteCartItem = createAsyncThunk(
     dispatch(fetchCart(userId));
   }
 );
+
+export const clearCart = createAsyncThunk("cart/clear", async (userId) => {
+  await axios.delete(`${import.meta.env.VITE_BASE_URL_CART}/user/${userId}`);
+  return [];
+});
 
 const cartSlice = createSlice({
   name: "cart",
@@ -51,6 +54,9 @@ const cartSlice = createSlice({
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
+      })
+      .addCase(clearCart.fulfilled, (state) => {
+        state.items = [];
       });
   },
 });
