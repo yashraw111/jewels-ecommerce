@@ -1,5 +1,7 @@
 import { element, exact } from 'prop-types'
 import React from 'react'
+import OrderReturn from './components/Crud/cart/OrderReturn.jsx'
+import DeliveredOrderList from './components/Crud/cart/DeliveredOrderList.jsx'
 // import UpdateCategory from './components/Crud/Category/UpdateCategory.js'
 // import UpdateProject from './components/Crud/Product/UpdateProject.js'
 
@@ -94,6 +96,8 @@ const routes = [
 
   { path: '/base/ViewSubCategory', exact: true, name: 'ViewSubCategory', element: ViewSubCategory },
   { path: '/base/allcart', exact: true, name: 'ViewSubCategory', element: AllCart },
+  { path: '/base/returnOrder', exact: true, name: 'ViewSubCategory', element: OrderReturn },
+  { path: '/base/DeliveredOrderList', exact: true, name: 'ViewSubCategory', element: DeliveredOrderList },
   {
     path: '/base/CreateSubCategory',
     exact: true,

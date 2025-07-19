@@ -12,6 +12,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/payment.routes")
 const wishlistRoute = require('./routes/Wishlist.route');
 const contactRoutes = require('./routes/contact.route');
+const notifyRoutes = require('./routes/notify.routes');
 
 dotenv.config()
 app.use(express.json())
@@ -44,6 +45,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use('/api/wishlist', wishlistRoute);
 app.use("/api/", contactRoutes); // 👈 Use
+app.use("/api/notify", notifyRoutes); // 👈 Use
 
 // app.use("/api/payment", PaymentRoute);
 

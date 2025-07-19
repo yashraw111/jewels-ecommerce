@@ -24,10 +24,19 @@ const orderSchema = new mongoose.Schema({
     razorpay_payment_id: String,
   },
 status: {
-  type: String,
-  enum: ["Processing", "Shipped", "Out for delivery", "Delivered"], // <-- added here
-  default: "Processing",
-},
+    type: String,
+    enum: [
+      "Processing",
+      "Shipped",
+      "Out for delivery",
+      "Delivered",
+      "Cancelled",
+      "Return Requested", // Existing
+      "Return Approved",  // <-- New
+      "Return Rejected"   // <-- New
+    ],
+    default: "Processing",
+  },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -577,7 +577,20 @@ const _nav = [
         to: '/base/allcart',
         icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
       },
+      {
+        component: CNavItem,
+        name: 'Return Order',
+        to: '/base/returnOrder',
+        icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
+      },
+      {
+        component: CNavItem,
+        name: 'DeliveredOrderList',
+        to: '/base/DeliveredOrderList',
+        icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
+      },
     ],
+   
   },
 ]
 

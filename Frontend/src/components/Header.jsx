@@ -107,12 +107,10 @@ const Header = () => {
                 {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
             </div>
-
             {/* Logo */}
             <div className="flex-1 md:flex-none text-center md:text-left">
               <h1 className="text-black font-extrabold text-2xl sm:text-3xl">KUKU</h1>
             </div>
-
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
               <NavLink to="/" className={navLinkClass}>Home</NavLink>
@@ -191,7 +189,7 @@ const Header = () => {
               )}
 
               {/* Wishlist Icon - visible on all screens when logged in */}
-              {user && user._id && (
+              {user  && (
                 <NavLink to="/wishList" className="hidden sm:block">
                   <div className="flex items-center gap-2 text-white p-2 bg-purple-600 rounded-full hover:bg-purple-700 cursor-pointer transform transition-transform duration-300 hover:scale-110">
                     <Heart size={18} className="text-white" />

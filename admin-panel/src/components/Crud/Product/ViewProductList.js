@@ -18,7 +18,6 @@ const ViewProductList = () => {
   const { ProductList } = useSelector((state) => state.product)
   const dispatch = useDispatch()
   const [searchTerm, setSearchTerm] = useState('')
-
   useEffect(() => {
     dispatch(ViewList())
   }, [dispatch])

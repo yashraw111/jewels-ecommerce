@@ -30,7 +30,7 @@ export const deleteCartItem = createAsyncThunk(
 );
 
 export const clearCart = createAsyncThunk("cart/clear", async (userId) => {
-  await axios.delete(`${import.meta.env.VITE_BASE_URL_CART}/user/${userId}`);
+  await axios.delete(`${import.meta.env.VITE_BASE_URL_CART}/clear/${userId}`); // ✅ Corrected
   return [];
 });
 

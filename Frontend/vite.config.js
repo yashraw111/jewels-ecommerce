@@ -8,4 +8,7 @@ export default defineConfig({
    server: {
     host: true, // 👈 This is important
   },
+   optimizeDeps: {
+    include: ["react-inner-image-zoom"],
+  },
 })

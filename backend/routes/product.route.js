@@ -13,7 +13,8 @@ const {
   getAllReviews,
   getRelatedProducts,
   getCusAllReviews,
-  getAllCategoriesWithProductCount
+  getAllCategoriesWithProductCount,
+  decrementProductStock
 } = require("../controllers/product.controller");
 
 const upload = require("../middleware/upload");
@@ -30,6 +31,7 @@ router.delete("/:id", deleteProduct);
 router.put("/:id", upload.array("images"), updateProduct);
 router.get("/reviews/customer", getCusAllReviews); 
 router.get("/categories/with-count", getAllCategoriesWithProductCount);
+router.get("/decrement-stock", decrementProductStock);
 
 
 

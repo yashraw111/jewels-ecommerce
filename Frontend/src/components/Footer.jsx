@@ -1,4 +1,5 @@
 import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Link } from "react-router-dom";
 import Container from "./Container";
 
 export default function Footer() {
@@ -39,19 +40,25 @@ export default function Footer() {
             </p>
             <div className="flex space-x-4 items-center">
               <a
-                href="#"
+                href="https://twitter.com"
+                target="_blank"
+                rel="noreferrer"
                 className="h-10 w-10 flex items-center justify-center  bg-white text-[#a344e1] rounded-full shadow hover:bg-gray-100 transition"
               >
                 <Twitter />
               </a>
               <a
-                href="#"
+                href="https://facebook.com"
+                target="_blank"
+                rel="noreferrer"
                 className="h-10 w-10 flex items-center justify-center bg-white text-[#a344e1] rounded-full shadow hover:bg-gray-100 transition"
               >
                 <Facebook />
               </a>
               <a
-                href="#"
+                href="https://instagram.com"
+                target="_blank"
+                rel="noreferrer"
                 className="h-10 w-10 flex items-center justify-center bg-white text-[#a344e1] rounded-full shadow hover:bg-gray-100 transition"
               >
                 <Instagram />
@@ -63,21 +70,11 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-3">Quick Links</h4>
             <ul className="space-y-1">
-              <li>
-                <a href="#">Home</a>
-              </li>
-              <li>
-                <a href="#">About</a>
-              </li>
-              <li>
-                <a href="#">All Product</a>
-              </li>
-              <li>
-                <a href="#">Categories</a>
-              </li>
-              <li>
-                <a href="#">Contact</a>
-              </li>
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/about">About</Link></li>
+              <li><Link to="/products">All Product</Link></li>
+              <li><Link to="/category">Categories</Link></li>
+              <li><Link to="/contact">Contact</Link></li>
             </ul>
           </div>
 
@@ -85,21 +82,11 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-3">Customer Service</h4>
             <ul className="space-y-1">
-              <li className="">
-                <a href="#">Track Order</a>
-              </li>
-              <li>
-                <a href="#">Return & Exchange</a>
-              </li>
-              <li>
-                <a href="#">Shipping Policy</a>
-              </li>
-              <li>
-                <a href="#">FAQs</a>
-              </li>
-              <li>
-                <a href="#">Privacy Policy</a>
-              </li>
+              <li><Link to="/order-success">Track Order</Link></li>
+              <li><Link to="/contact">Return & Exchange</Link></li>
+              <li><Link to="/shipping-policy">Shipping Policy</Link></li>
+              <li><Link to="/faqs">FAQs</Link></li>
+              <li><Link to="/privacy-policy">Privacy Policy</Link></li>
             </ul>
           </div>
 

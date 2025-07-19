@@ -6,9 +6,16 @@ const initialState = {
   ProductList: [],
 }
 export const Createpr = createAsyncThunk('product/Createpr', async (data) => {
- const res= await axios.post(`${import.meta.env.VITE_BASE_URL_PRO}`, data)
-  return res.data.data
+  console.log("slice data",data)
+  const res= await axios.post(
+    `${import.meta.env.VITE_BASE_URL_PRO}`,
+    data,
+    { headers: { 'Content-Type': 'multipart/form-data' } }
+  )
+  console.log("slice res",res)
 
+
+  return res.data.data
 })
 export const Deletepr = createAsyncThunk('product/Deletepr', async (id) => {
   const res = axios.delete(`${import.meta.env.VITE_BASE_URL_PRO}/${id}`)
@@ -18,10 +25,11 @@ export const ViewList = createAsyncThunk('product/ViewList', async () => {
   const res = await axios.get(`${import.meta.env.VITE_BASE_URL_PRO}/`)
   return res.data
 })
-export const UpdateProduct = createAsyncThunk('product/UpdateProduct', async (data) => {
-  const { _id } = data
-  await axios.put(`${import.meta.env.VITE_BASE_URL_PRO}/${_id}`, data)
-  return data
+export const UpdateProduct = createAsyncThunk('product/UpdateProduct', async ({ formData, _id }) => {
+  await axios.put(`${import.meta.env.VITE_BASE_URL_PRO}/${_id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+  return { ...formData, _id }; // Just to keep state consistent
 })
 const ProductSlice = createSlice({
   name: 'product',

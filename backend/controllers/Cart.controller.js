@@ -41,10 +41,21 @@ exports.getCartItems = async (req, res) => {
 
 // ✅ Delete specific cart item
 exports.deleteCartItem = async (req, res) => {
+  // clg
   try {
     const { id } = req.params; // Cart item _id
     await Cart.findByIdAndDelete(id);
     res.json({ message: "Cart item deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.clearCartByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    await Cart.deleteMany({ userId });
+    res.json({ message: "Cart cleared successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
