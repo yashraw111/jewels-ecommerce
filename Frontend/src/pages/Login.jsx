@@ -21,7 +21,7 @@ const Login = () => {
   const redirect = useNavigate();
   const onSubmit = async (data) => {
     try {
-      const res = await axios.post("http://localhost:8000/api/auth/login", data, {
+      const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/auth/login`, data, {
         withCredentials: true,
       });
       toast.success("Login successful");
@@ -43,7 +43,7 @@ const handleGoogleLogin = async () => {
     const user = result.user;
 
     // Step 2: Send Google user data to backend
-    const res = await axios.post("http://localhost:8000/api/auth/google-login", {
+    const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/auth/google-login`, {
       name: user.displayName,
       email: user.email,
       avatar: user.photoURL,
