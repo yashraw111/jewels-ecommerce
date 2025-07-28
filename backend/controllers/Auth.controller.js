@@ -29,7 +29,6 @@ const Register = async (req, res, next) => {
 const Login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-
     const user = await User.findOne({ email });
     if (!user) {
       return next(handleError(404, "Invalid login credentials."));
@@ -49,14 +48,12 @@ const Login = async (req, res, next) => {
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
-
     res.cookie("access_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       path: "/",
     });
-
     const userData = user.toObject();
     delete userData.password;
 
@@ -70,7 +67,6 @@ const Login = async (req, res, next) => {
     return next(handleError(500, "Something went wrong. Please try again."));
   }
 };
-
 const GoogleLogin = async (req, res, next) => {
   console.log(req.body)
   try {
@@ -87,7 +83,6 @@ const GoogleLogin = async (req, res, next) => {
       });
       await user.save();
     }
-
     const token = jwt.sign(
       {
         _id: user._id,

@@ -3,5 +3,4 @@ function handleError(statusCode, message) {
   error.status = statusCode;
   return error;
 }
-
 module.exports = { handleError };

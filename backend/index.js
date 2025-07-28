@@ -13,6 +13,7 @@ const paymentRoutes = require("./routes/payment.routes")
 const wishlistRoute = require('./routes/Wishlist.route');
 const contactRoutes = require('./routes/contact.route');
 const notifyRoutes = require('./routes/notify.routes');
+const helmet = require("helmet");
 
 dotenv.config()
 app.use(express.json())
@@ -22,7 +23,8 @@ app.use(express.urlencoded({extended:true}))
 //     credentials: true // Allow credentials
 //   }));
 const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000',  'https://jewels-ecommerce-frontend.onrender.com',
-  'https://jewels-ecommerce-admin.onrender.com']
+  'https://jewels-ecommerce-admin.onrender.com',"http://192.168.1.5:5173/"]
+app.use(helmet());
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -48,8 +50,6 @@ app.use("/api/", contactRoutes); // 👈 Use
 app.use("/api/notify", notifyRoutes); // 👈 Use
 
 // app.use("/api/payment", PaymentRoute);
-
-
 require("./config/db").main()
 app.use((err, req, res, next) => {
   const status = err.status || 500;
@@ -58,7 +58,6 @@ app.use((err, req, res, next) => {
     message: err.message || "Internal Server Error",
   });
 });
-
 const port = process.env.PORT || 3000
 app.get('/', (req, res) => res.send('Hello World!'))
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

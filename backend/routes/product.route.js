@@ -31,7 +31,7 @@ router.delete("/:id", deleteProduct);
 router.put("/:id", upload.array("images"), updateProduct);
 router.get("/reviews/customer", getCusAllReviews); 
 router.get("/categories/with-count", getAllCategoriesWithProductCount);
-router.get("/decrement-stock", decrementProductStock);
+router.post("/decrement-stock", decrementProductStock);
 
 
 
