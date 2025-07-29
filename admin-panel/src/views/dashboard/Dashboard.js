@@ -30,7 +30,7 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         // 👇 अपने सर्वर का सही URL और PORT डालें
-        const response = await fetch('http://localhost:8000/api/dashboard/main-data')
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/dashboard/main-data`)
         const result = await response.json()
         if (result.success) {
           setRecentUsers(result.data.recentUsers)

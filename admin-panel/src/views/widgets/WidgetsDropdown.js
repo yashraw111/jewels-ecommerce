@@ -38,7 +38,7 @@ const WidgetsDropdown = (props) => {
     const fetchStats = async () => {
       try {
         // 👇 अपने सर्वर का सही URL और PORT डालें
-        const response = await fetch('http://localhost:8000/api/dashboard/stats')
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/api/dashboard/stats`)
         const result = await response.json()
         if (result.success) {
           setStats(result.data)
