@@ -34,10 +34,8 @@ const AppHeaderDropdown = () => {
   }
 
     const admin = JSON.parse(localStorage.getItem('admin'))
-    // console.log(admin)
 
     const adminName = admin.username.toUpperCase("")
-    console.log(adminName)
 
 
   return (

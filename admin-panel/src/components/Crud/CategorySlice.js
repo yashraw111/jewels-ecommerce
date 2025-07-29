@@ -13,7 +13,6 @@ export const CreateCate = createAsyncThunk("Category/CreateCate", async (formDat
 
 export const ViewCateList = createAsyncThunk('Category/ViewCateList', async () => {
   const res = await axios.get(`${import.meta.env.VITE_BASE_URL_CAT}`)
-  console.log(res)
   return res.data
 })
 
@@ -42,7 +41,6 @@ const CategorySlice = createSlice({
     builder
       .addCase(CreateCate.fulfilled, (state, action) => {
         state.CateList.push(action.payload)
-        console.log(state.CateList)
       })
       .addCase(ViewCateList.fulfilled, (state, action) => {
         state.CateList = action.payload

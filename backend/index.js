@@ -14,7 +14,8 @@ const wishlistRoute = require('./routes/Wishlist.route');
 const contactRoutes = require('./routes/contact.route');
 const notifyRoutes = require('./routes/notify.routes');
 const helmet = require("helmet");
-
+const DashboardRoute = require("./routes/dashboard.route"); // 👈 यह लाइन जोड़ें
+ const { supportRoute } = require("./routes/support.route"); 
 dotenv.config()
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
@@ -48,7 +49,8 @@ app.use("/api/payment", paymentRoutes);
 app.use('/api/wishlist', wishlistRoute);
 app.use("/api/", contactRoutes); // 👈 Use
 app.use("/api/notify", notifyRoutes); // 👈 Use
-
+app.use("/api/dashboard/", DashboardRoute); // 👈
+app.use("/api/support", supportRoute)
 // app.use("/api/payment", PaymentRoute);
 require("./config/db").main()
 app.use((err, req, res, next) => {

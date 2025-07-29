@@ -22,7 +22,6 @@ const AddCategory = () => {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const dispatch = useDispatch()
   const {CateList}= useSelector((state)=>state.Category)
-  console.log(CateList)
   useEffect(() => {
     dispatch(ViewCateList())
   }, [dispatch]);

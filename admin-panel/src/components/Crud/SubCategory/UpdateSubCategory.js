@@ -31,8 +31,6 @@ const UpdateSubCategory = () => {
   const { id } = useParams()
   const { CateList } = useSelector((state) => state.Category)
   const { SubCateList } = useSelector((state) => state.SubCategory)
-  console.log(SubCateList)
-  console.log('subCat', CateList)
   const singleSubCat = CateList.map((ele) => {
     
   })

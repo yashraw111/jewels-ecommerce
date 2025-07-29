@@ -20,7 +20,6 @@ const CategoryProducts = () => {
       .catch((err) => console.error("Error fetching category products:", err));
   }, [id]);
 
-  console.log(products);
   return (
     <div className="py-10">
       <Container>

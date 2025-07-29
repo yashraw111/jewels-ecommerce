@@ -12,7 +12,6 @@ const ViewCategory = () => {
   useEffect(() => {
     dispatch(ViewSubCateList())
   }, [])
-  // console.log(CateList)
   const redirect = useNavigate()
 
   async function trash(id) {

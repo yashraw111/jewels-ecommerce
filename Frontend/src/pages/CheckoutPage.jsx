@@ -138,9 +138,6 @@ const handlePlaceOrder = async () => {
     }
   }
 };
-
-console.log(cartItems)
-
   return (
     <div className="py-10 px-6">
       <Container>

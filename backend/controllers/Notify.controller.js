@@ -1,7 +1,6 @@
 const NotifyRequest = require("../models/NotifyRequest.model");
 
 exports.addNotifyRequest = async (req, res) => {
-  console.log(req.body)
   try {
     const { productId, size, email } = req.body;
 

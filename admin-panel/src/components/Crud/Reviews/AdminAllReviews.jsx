@@ -13,7 +13,6 @@ const AdminAllReviews = () => {
       console.error("Failed to load reviews", error);
     }
   };
-  console.log(reviews)
 
 const deleteReview = async (productId, reviewId) => {
   const confirm = await Swal.fire({
@@ -34,7 +33,6 @@ const deleteReview = async (productId, reviewId) => {
     }
   }
 };
-console.log(reviews)
 
 
   useEffect(() => {

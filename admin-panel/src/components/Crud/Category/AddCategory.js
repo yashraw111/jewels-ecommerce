@@ -29,8 +29,6 @@ const AddCategory = () => {
 const selectedImage = watch('cat_image')
 
   const { CateList } = useSelector((state) => state.Category)
-  console.log(CateList)
-console.log(CateList)
   useEffect(() => {
     dispatch(ViewCateList())
   }, [dispatch])

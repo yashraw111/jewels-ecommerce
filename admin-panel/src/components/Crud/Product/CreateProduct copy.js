@@ -56,7 +56,6 @@ const CreateProduct = () => {
               <CFormSelect  aria-label="Default select example" {...register('CateGory')}>
                 <option>Open this select menu</option>
                 {CateList.map((ele) => {
-                  console.log(ele)
                   return (
                     <>
                       <option value={ele.cat_name}>{ele.cat_name}</option>

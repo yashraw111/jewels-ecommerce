@@ -6,13 +6,11 @@ const initialState = {
   ProductList: [],
 }
 export const Createpr = createAsyncThunk('product/Createpr', async (data) => {
-  console.log("slice data",data)
   const res= await axios.post(
     `${import.meta.env.VITE_BASE_URL_PRO}`,
     data,
     { headers: { 'Content-Type': 'multipart/form-data' } }
   )
-  console.log("slice res",res)
 
 
   return res.data.data

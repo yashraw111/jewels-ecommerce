@@ -24,7 +24,6 @@ export const CartProvider = ({ children }) => {
         userId,
         productId,
       });
-      console.log(res.data.message);
       fetchCart(); // update cart
     } catch (err) {
       console.error("Toggle cart error:", err);

@@ -48,11 +48,9 @@ export default function ViewWishlist() {
             // Fetch full product details for each ID
             const detailedProductsPromises = productIds.map(id => fetchProductDetailsById(id));
             const detailedProducts = (await Promise.all(detailedProductsPromises)).filter(p => p !== null); // Filter out failed fetches
-            console.log(detailedProducts)
             const filterData = detailedProducts.map((pr)=>{
               return pr.data
             })
-            console.log(filterData)
             setWishlistProducts(filterData);
           } else {
             setWishlistProducts([]);
@@ -115,7 +113,6 @@ export default function ViewWishlist() {
       });
   };
 
-  console.log(wishlistProducts)
   return (
     <div className="p-8">
       <h2 className="text-2xl font-semibold mb-2">Wishlist</h2>

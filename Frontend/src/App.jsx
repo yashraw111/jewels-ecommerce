@@ -7,8 +7,12 @@ import {
   useLocation,
 } from "react-router-dom";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import SupportChatWidget from "./components/SupportChatWidget"; // 👈 विजेट को इम्पोर्ट करें
 
 // Lazy-loaded pages
 const Home = lazy(() => import("./pages/Home"));
@@ -98,6 +102,19 @@ const App = () => {
   return (
     <Router>
       <AppContent />
+      <SupportChatWidget /> {/* 👈 विजेट को यहाँ जोड़ें */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </Router>
   );
 };

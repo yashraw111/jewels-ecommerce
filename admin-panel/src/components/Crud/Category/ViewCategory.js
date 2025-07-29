@@ -18,7 +18,6 @@ const ViewCategory = () => {
   const dispatch = useDispatch()
   const redirect = useNavigate()
 
-  console.log(CateList)
   useEffect(() => {
     dispatch(ViewCateList())
   }, [])

@@ -28,11 +28,9 @@ const Register = async (req, res, next) => {
 };
 
 const Login = async (req, res, next) => {
-  console.log(req.body)
   try {
     const { email, password } = req.body;
     const admin = await Admin.findOne({ email });
-    console.log(admin)
     if (!admin) {
       res.json({
         success:false,

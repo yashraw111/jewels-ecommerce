@@ -68,7 +68,6 @@ const Login = async (req, res, next) => {
   }
 };
 const GoogleLogin = async (req, res, next) => {
-  console.log(req.body)
   try {
     const { name, email, avatar } = req.body;
     let user = await User.findOne({ email });

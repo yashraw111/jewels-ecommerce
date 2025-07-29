@@ -1,151 +1,191 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo, useCallback } from "react";
 import axios from "axios";
-import { ShoppingCart, Heart } from "lucide-react";
+import { ShoppingCart, Heart, ArrowRight } from "lucide-react";
 import Container from "./Container";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCart, toggleCart } from "../redux/cartSlice";
-import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+
+// Define a key for local storage for guest wishlist
+const LOCAL_WISHLIST_KEY_NEW_ARRIVALS = 'local_wishlist_new_arrivals';
+
+// A memoized Product Card component to prevent unnecessary re-renders and handle its own logic.
+const ProductCard = memo(({ product, onWishlistToggle, onCartToggle, isLiked, isInCart }) => {
+    return (
+        <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group relative">
+            {/* Wishlist Button */}
+            <button
+                onClick={() => onWishlistToggle(product._id)}
+                title={isLiked ? "Remove from Wishlist" : "Add to Wishlist"}
+                className={`absolute top-3 right-3 z-10 p-2 rounded-full shadow-md transition-all duration-300 ${
+                    isLiked ? "bg-red-500 text-white" : "bg-white text-gray-600 hover:bg-red-100"
+                }`}
+            >
+                <Heart size={18} fill={isLiked ? "currentColor" : "none"} />
+            </button>
+
+            <Link to={`/product/${product._id}`} className="block">
+                <img
+                    src={product.images?.[0] || "https://placehold.co/400x400/f0f0f0/333?text=No+Image"}
+                    alt={product.productName}
+                    className="w-full h-52 object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                />
+            </Link>
+
+            <div className="p-4 text-left">
+                <Link to={`/product/${product._id}`} className="block">
+                    <h3 className="text-sm sm:text-base font-semibold text-gray-800 truncate mb-1 hover:text-purple-600">
+                        {product.productName}
+                    </h3>
+                </Link>
+                <p className="text-base text-purple-600 font-bold">
+                    ₹{product.productPrice?.toLocaleString()}
+                </p>
+
+                {/* Add to Cart Icon Button - Always visible, perfect for mobile */}
+                <button
+                    onClick={() => onCartToggle(product._id)}
+                    title={isInCart ? "Remove from Cart" : "Add to Cart"}
+                    className={`absolute bottom-4 right-4 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${
+                        isInCart ? "bg-red-500 text-white" : "bg-purple-600 text-white hover:bg-purple-700"
+                    }`}
+                >
+                    <ShoppingCart size={20} />
+                </button>
+            </div>
+        </div>
+    );
+});
+
+// Skeleton loader for a polished loading state
+const ProductSkeleton = () => (
+    <div className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+        <div className="w-full h-52 bg-gray-200"></div>
+        <div className="p-4">
+            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+        </div>
+    </div>
+);
 
 const NewArrivals = () => {
-  const [products, setProducts] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.user);
-  const cartItems = useSelector((state) => state.cart.items);
+    const [products, setProducts] = useState([]);
+    const [wishlist, setWishlist] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user.user);
+    const cartItems = useSelector((state) => state.cart.items);
 
-  useEffect(() => {
-    if (user && user._id) {
-      dispatch(fetchCart(user._id));
-      fetchWishlist();
-    }
-  }, [user, dispatch]);
+    // Fetch wishlist from backend or local storage
+    const fetchWishlist = useCallback(async () => {
+        if (user && user._id) {
+            try {
+                const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/wishlist/wishlist/${user._id}`);
+                setWishlist(res.data.wishlist.map(item => item._id)); // Store only IDs
+            } catch (err) {
+                console.error("Failed to fetch wishlist:", err);
+            }
+        } else {
+            const localWishlist = JSON.parse(localStorage.getItem(LOCAL_WISHLIST_KEY_NEW_ARRIVALS) || "[]");
+            setWishlist(localWishlist);
+        }
+    }, [user]);
 
-  async function fetchWishlist() {
-    try {
-      const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/api/wishlist/wishlist/${user._id}`);
-      setWishlist(res.data.wishlist);
-    } catch (err) {
-      console.error("Failed to fetch wishlist:", err);
-    }
-  }
+    useEffect(() => {
+        if (user && user._id) {
+            dispatch(fetchCart(user._id));
+        }
+        fetchWishlist();
+    }, [user, dispatch, fetchWishlist]);
 
-  async function toggleWishlist(productId) {
-    if (!user || !user._id) {
-      toast.warning("Please login to manage wishlist");
-      return;
-    }
-    try {
-      await axios.post(`${import.meta.env.VITE_BASE_URL}/api/wishlist/toggle`, {
-        userId: user._id,
-        productId,
-      });
-      fetchWishlist();
-    } catch (err) {
-      toast.error("Failed to update wishlist");
-      console.error("Wishlist error:", err);
-    }
-  }
+    // Handle wishlist toggle for both logged-in and guest users
+    const handleWishlistToggle = async (productId) => {
+        if (user && user._id) {
+            try {
+                const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/api/wishlist/toggle`, {
+                    userId: user._id,
+                    productId,
+                });
+                toast.success(res.data.message);
+                fetchWishlist(); // Re-fetch to update state
+            } catch (err) {
+                toast.error("Failed to update wishlist");
+            }
+        } else {
+            // Handle guest wishlist in local storage
+            const updatedWishlist = wishlist.includes(productId)
+                ? wishlist.filter(id => id !== productId)
+                : [...wishlist, productId];
+            
+            localStorage.setItem(LOCAL_WISHLIST_KEY_NEW_ARRIVALS, JSON.stringify(updatedWishlist));
+            setWishlist(updatedWishlist);
+            toast.success(wishlist.includes(productId) ? "Removed from wishlist" : "Added to wishlist");
+        }
+    };
 
-  useEffect(() => {
-    async function fetchNewArrivals() {
-      try {
-        const res = await axios.get(`${import.meta.env.VITE_BASE_URL_PRO}?new=true`);
-        setProducts(res.data.slice(0, 4));
-      } catch (err) {
-        console.error("Failed to fetch new arrivals:", err);
-      }
-    }
-    fetchNewArrivals();
-  }, []);
+    // Handle cart toggle
+    const handleCartToggle = async (productId) => {
+        if (!user || !user._id) {
+            return toast.warning("Please login to manage your cart");
+        }
+        try {
+            const isInCart = cartItems.some((item) => item.productId._id === productId);
+            await dispatch(toggleCart({ userId: user._id, productId })).unwrap();
+            toast.success(isInCart ? "Removed from cart" : "Added to cart");
+        } catch (err) {
+            toast.error("Failed to update cart");
+        }
+    };
 
-  return (
-    <section className="bg-[#f1f6fd] py-16 px-4">
-      <Container>
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h2 className="text-2xl font-bold">New Arrivals</h2>
-              <p className="text-gray-600">Fresh styles just in! Shop the latest arrivals now.</p>
-            </div>
-            <Link to="/products">
-              <button className="text-sm text-gray-600 hover:text-black flex items-center gap-1">
-                View All
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </Link>
-          </div>
+    useEffect(() => {
+        async function fetchNewArrivals() {
+            setIsLoading(true);
+            try {
+                const res = await axios.get(`${import.meta.env.VITE_BASE_URL_PRO}?new=true`);
+                setProducts(res.data.slice(0, 4));
+            } catch (err) {
+                console.error("Failed to fetch new arrivals:", err);
+                toast.error("Could not load new arrivals.");
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        fetchNewArrivals();
+    }, []);
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {products.map((product) => {
-              const isInCart = cartItems.some((item) => item.productId._id === product._id);
-              const isLiked = wishlist.some((item) => item._id === product._id);
-
-              return (
-                <div
-                  key={product._id}
-                  className="bg-white rounded-md shadow-sm overflow-hidden border border-purple-100 group relative transition-all duration-300"
-                >
-                  {/* Like Icon only visible on hover */}
-                  <button
-                    onClick={() => toggleWishlist(product._id)}
-                    className="absolute top-2 right-2 bg-white p-1 rounded-full shadow  group-hover:flex transition duration-300 z-10"
-                  >
-                    <Heart
-                      size={20}
-                      strokeWidth={2.5}
-                      className={isLiked ? "text-red-500 fill-red-500" : "text-gray-400"}
-                    />
-                  </button>
-
-                  <Link to={`/product/${product._id}`}>
-                    <img
-                      src={product.images?.[0] || "https://via.placeholder.com/200"}
-                      alt={product.productName}
-                      className="w-full h-52 object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </Link>
-
-                  <div className="p-4 relative">
-                    {/* Add to Cart button - hidden by default, visible on hover with animation */}
-                    <button
-                      className={`absolute left-1/2 transform -translate-x-1/2 bottom-16 flex justify-center items-center gap-2 text-sm py-2 px-4 rounded-md font-medium
-                        transition-all duration-300 opacity-0 translate-y-4
-                        group-hover:opacity-100 group-hover:translate-y-0
-                        ${isInCart ? "bg-red-500 text-white" : "bg-purple-600 text-white"}
-                      `}
-                      onClick={() => {
-                        if (!user || !user._id) {
-                          toast.warning("Please login to add product to cart");
-                          return;
-                        }
-
-                        dispatch(toggleCart({ userId: user._id, productId: product._id }))
-                          .then(() => {
-                            toast.success(isInCart ? "Removed from cart" : "Added to cart");
-                            dispatch(fetchCart(user._id));
-                          })
-                          .catch(() => toast.error("Cart update failed"));
-                      }}
-                    >
-                      <ShoppingCart />
-                      {isInCart ? "Remove from Cart" : "Add to Cart"}
-                    </button>
-
-                    {/* Product name and price always visible */}
-                    <h3 className="text-sm font-semibold">{product.productName}</h3>
-                    <p className="text-sm text-purple-600 font-semibold">₹{product.productPrice}</p>
-                  </div>
+    return (
+        <section className="bg-purple-50 py-16">
+            <Container>
+                <div className="flex justify-between items-center mb-8">
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-800">New Arrivals</h2>
+                        <p className="text-gray-600 mt-1">Fresh styles just in! Shop the latest arrivals now.</p>
+                    </div>
+                    <Link to="/products" className="flex items-center gap-2 text-purple-600 font-semibold hover:text-purple-800 transition-colors">
+                        <span>View All</span>
+                        <ArrowRight size={18} />
+                    </Link>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      </Container>
-    </section>
-  );
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                    {isLoading
+                        ? [...Array(4)].map((_, i) => <ProductSkeleton key={i} />)
+                        : products.map((product) => (
+                            <ProductCard
+                                key={product._id}
+                                product={product}
+                                onWishlistToggle={handleWishlistToggle}
+                                onCartToggle={handleCartToggle}
+                                isLiked={wishlist.includes(product._id)}
+                                isInCart={cartItems.some((item) => item.productId._id === product._id)}
+                            />
+                        ))}
+                </div>
+            </Container>
+        </section>
+    );
 };
 
 export default NewArrivals;

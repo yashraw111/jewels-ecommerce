@@ -38,7 +38,6 @@ const Login = () => {
       data,
       { withCredentials: true }
     )
-    console.log(res)
     if(res.data.success == true){
       toast.success('Login successful!')
     navigate('/dashboard')
